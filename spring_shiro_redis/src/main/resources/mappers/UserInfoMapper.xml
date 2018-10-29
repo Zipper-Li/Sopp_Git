@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Li.mapper.UserInfoMapper">
+
+	<resultMap id="myUserMap" type="com.Li.pojo.UserInfo">
+		<id property="id" column="id" />
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="passSalt" column="passSalt" />
+		<result property="status" column="status" />
+		<collection property="role" ofType="com.Li.pojo.Role">
+			<id property="id" column="roleId" />
+			<result property="roleName" column="roleName" />
+		</collection>
+		<collection property="permission" ofType="com.Li.pojo.Permission">
+			<id property="id" column="permissionId" />
+			<result property="permissionUrl" column="permissionUrl" />
+		</collection>
+	</resultMap>
+
+	<!-- 根据用户名查询角色和权限信息 -->
+	<select id="findByUsername" parameterType="string" resultMap="myUserMap">
+		SELECT
+		info.id as id,
+		info.username as username,
+		info.password as
+		password,
+		info.pass_salt as passSalt,
+		info.status as status,
+		role_info.id as roleId,
+		role_info.role_name as roleName,
+		per.id as
+		permissionId,
+		per.permission_url as permissionUrl
+		FROM
+		user_info info
+		LEFT JOIN user_group group1 ON info.user_groupid = group1.id
+		LEFT JOIN
+		user_group_role role1 ON group1.id = role1.id
+		left join role role_info
+		on role_info.id = role1.role_id
+		LEFT JOIN role_permission roleper ON
+		role1.id = roleper.role_id
+		LEFT JOIN permission per ON per.id =
+		roleper.permission_id
+		where info.username = #{username}
+		limit 1
+	</select>
+</mapper>

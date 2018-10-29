@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 文件输出格式 -->
+    <property name="PATTERN" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n"/>
+    <!-- 测试环境文件输出路径,暂未考虑Linux环境 -->
+    <property name="TEST_FILE_PATH" value="${catalina.base}/logs"/>
+    <!-- 生产环境文件输出路径 -->
+    <property name="PRO_FILE_PATH" value="${catalina.base}/logs"/>
+
+    <!-- 开发环境 -->
+    <springProfile name="dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${PATTERN}</pattern>
+            </encoder>
+        </appender>
+        <!--com.code.springbootlogback.service为根包，也就是只要是发生在这个根包下面的所有日志操作行为的权限都是DEBUG-->
+        <logger name="com.code.springbootlogback.service" level="debug"/>
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 测试环境,每天产生一个文件 -->
+    <springProfile name="uat">
+        <!-- 每天产生一个文件 -->
+        <appender name="UAT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 文件路径 -->
+            <file>${TEST_FILE_PATH}.txt</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- 文件名称 -->
+                <fileNamePattern>${TEST_FILE_PATH}-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <!-- 文件最大保存历史数量 -->
+                <MaxHistory>100</MaxHistory>
+            </rollingPolicy>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${PATTERN}</pattern>
+            </layout>
+        </appender>
+        <root level="debug">
+            <appender-ref ref="UAT_FILE"/>
+        </root>
+    </springProfile>
+    <!-- 测试环境,每天产生n个文件,每个文件超过大小限制时候会新建一个文件 -->
+    <springProfile name="uat">
+        <appender name="UAT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${TEST_FILE_PATH}.txt</file>
+            <!-- rollingPolicy:当发生滚动时，决定 RollingFileAppender 的行为，涉及文件移动和重命名。 -->
+            <!-- TimeBasedRollingPolicy： 最常用的滚动策略，它根据时间来制定滚动策略，既负责滚动也负责出发滚动 -->
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- 活动文件的名字会根据fileNamePattern的值，每隔一段时间改变一次 -->
+                <!-- 文件名：log/demo.2017-12-05.0.log -->
+                <fileNamePattern>${TEST_FILE_PATH}.%d.%i.log</fileNamePattern>
+                <!-- 每产生一个日志文件，该日志文件的保存期限为30天 -->
+                <maxHistory>30</maxHistory>
+                <timeBasedFileNamingAndTriggeringPolicy  class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <!-- maxFileSize:这是活动文件的大小，默认值是10MB，测试时可改成1KB看效果 -->
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+            </rollingPolicy>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${PATTERN}</pattern>
+            </layout>
+        </appender>
+        <root level="debug">
+            <appender-ref ref="UAT_FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 生产环境,每天产生一个文件 -->
+    <springProfile name="prod">
+        <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${PRO_FILE_PATH}.%d{yyyy-MM-dd}.txt</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${PRO_FILE_PATH}/warn.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <MaxHistory>100</MaxHistory>
+            </rollingPolicy>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${PATTERN}</pattern>
+            </layout>
+        </appender>
+        <root level="debug">
+            <appender-ref ref="PROD_FILE"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${PRO_FILE_PATH}.txt</file>
+            <!-- rollingPolicy:当发生滚动时，决定 RollingFileAppender 的行为，涉及文件移动和重命名。 -->
+            <!-- TimeBasedRollingPolicy： 最常用的滚动策略，它根据时间来制定滚动策略，既负责滚动也负责出发滚动 -->
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- 活动文件的名字会根据fileNamePattern的值，每隔一段时间改变一次 -->
+                <!-- 文件名：log/demo.2017-12-05.0.log -->
+                <fileNamePattern>${PRO_FILE_PATH}.%d.%i.log</fileNamePattern>
+                <!-- 每产生一个日志文件，该日志文件的保存期限为30天 -->
+                <maxHistory>30</maxHistory>
+                <timeBasedFileNamingAndTriggeringPolicy  class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <!-- maxFileSize:这是活动文件的大小，默认值是10MB，测试时可改成1KB看效果 -->
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+            </rollingPolicy>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${PATTERN}</pattern>
+            </layout>
+        </appender>
+        <root level="debug">
+            <appender-ref ref="PROD_FILE"/>
+        </root>
+    </springProfile>
+</configuration>
