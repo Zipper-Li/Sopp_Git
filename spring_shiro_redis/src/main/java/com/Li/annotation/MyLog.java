@@ -19,4 +19,5 @@ import java.lang.annotation.Target;
 @Documented //生成文档
 public @interface MyLog {
 	String value() default "";
+	
 }
